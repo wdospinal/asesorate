@@ -1,31 +1,44 @@
-import React from 'react';
+import * as React from 'react';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+import withFirebaseAuth from 'react-with-firebase-auth';
+import firebaseConfig from '../../../firebaseConfig';
+import { connect } from 'react-redux';
+import { compose } from 'recompose';
+import * as actions from '../../../constants/actions';
+
+const firebaseApp = firebase.initializeApp(firebaseConfig);
 
 class Login extends React.Component {
     render() {
+        const { user, signInWithGoogle , setUser } = this.props;
+        if (user) {
+            setUser(user)
+        }
         return (
-            <body class="bg-gradient-primary">
-                <div class="container">
-                    <div class="row justify-content-center">
-                        <div class="col-md-9 col-lg-12 col-xl-10">
-                            <div class="card shadow-lg o-hidden border-0 my-5">
-                                <div class="card-body p-0">
-                                    <div class="row">
-                                        <div class="col-lg-6 d-none d-lg-flex">
-                                            <div class="flex-grow-1 bg-login-image"></div>
+            <div className="bg-gradient-primary">
+                <div className="container">
+                    <div className="row justify-content-center">
+                        <div className="col-md-9 col-lg-12 col-xl-10">
+                            <div className="card shadow-lg o-hidden border-0 my-5">
+                                <div className="card-body p-0">
+                                    <div className="row">
+                                        <div className="col-lg-6 d-none d-lg-flex">
+                                            <div className="flex-grow-1 bg-login-image"></div>
                                         </div>
-                                        <div class="col-lg-6">
-                                            <div class="p-5">
-                                                <div class="text-center">
-                                                    <h4 class="text-dark mb-4">Bienvenido</h4>
+                                        <div className="col-lg-6">
+                                            <div className="p-5">
+                                                <div className="text-center">
+                                                    <h4 className="text-dark mb-4">Bienvenido</h4>
                                                 </div>
-                                                <form class="user">
-                                                    <div>
-                                                        <a class={"btn btn-primary btn-block text-white btn-google btn-user"} role="button">
-                                                            <i class="fab fa-google"></i>&nbsp; Login with Google</a>
+                                                <form className="user">
+                                                    <div onClick={signInWithGoogle}>
+                                                        <a className={"btn btn-primary btn-block text-white btn-google btn-user"} role="button">
+                                                            <i className="fab fa-google"></i>&nbsp; Login with Google</a>
                                                     </div>
                                                 </form>
-                                                <div class="text-center"></div>
-                                                <div class="text-center"></div>
+                                                <div className="text-center"></div>
+                                                <div className="text-center"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -34,9 +47,27 @@ class Login extends React.Component {
                         </div>
                     </div>
                 </div>
-            </body>
+            </div>
         );
     }
 }
+const firebaseAppAuth = firebaseApp.auth();
 
-export default Login;
+const providers = {
+    googleProvider: new firebase.auth.GoogleAuthProvider(),
+};
+const mapStateToProps = (state) => ({
+    users: state.userState.users,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    setUser: (user) => dispatch({ type: actions.USER_SET, user }),
+});
+
+export default compose(
+    withFirebaseAuth({
+        providers,
+        firebaseAppAuth,
+    }),
+    connect(mapStateToProps, mapDispatchToProps)
+)(Login);
