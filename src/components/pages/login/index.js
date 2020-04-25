@@ -6,14 +6,16 @@ import firebaseConfig from '../../../firebaseConfig';
 import { connect } from 'react-redux';
 import { compose } from 'recompose';
 import * as actions from '../../../constants/actions';
+import _ from 'lodash';
 
 const firebaseApp = firebase.initializeApp(firebaseConfig);
 
 class Login extends React.Component {
     render() {
         const { user, signInWithGoogle , setUser } = this.props;
-        if (user) {
-            setUser(user)
+        if (!_.isEmpty(user)) {
+            setUser(user);
+            this.props.history.push('/landing');
         }
         return (
             <div className="bg-gradient-primary">
@@ -33,8 +35,9 @@ class Login extends React.Component {
                                                 </div>
                                                 <form className="user">
                                                     <div onClick={signInWithGoogle}>
-                                                        <a className={"btn btn-primary btn-block text-white btn-google btn-user"} role="button">
-                                                            <i className="fab fa-google"></i>&nbsp; Login with Google</a>
+                                                        <div className={"btn btn-primary btn-block text-white btn-google btn-user"} role="button">
+                                                            <i className="fab fa-google"></i>&nbsp; Login with Google
+                                                        </div>
                                                     </div>
                                                 </form>
                                                 <div className="text-center"></div>
@@ -57,7 +60,7 @@ const providers = {
     googleProvider: new firebase.auth.GoogleAuthProvider(),
 };
 const mapStateToProps = (state) => ({
-    users: state.userState.users,
+    users: state.userState.user,
 });
 
 const mapDispatchToProps = (dispatch) => ({
